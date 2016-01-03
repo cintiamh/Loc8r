@@ -59,3 +59,26 @@ Becomes
     <p class="lead">Welcome to my page</p>
 </div>
 ```
+
+### Creating an Express Project and Trying it Out
+
+Since we decided to use the default configuration, just type in:
+
+```
+$ express
+```
+
+This will create the whole folder and files structure that will be the basis for our Loc8r application.
+Next, you'll need to install the dependencies.
+
+```
+$ npm install
+```
+
+To try it out, run:
+
+```
+$ npm start
+```
+
+Now you can check it out at http://localhost:3000
