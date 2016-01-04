@@ -219,3 +219,46 @@ module.exports = router;
 ```
 
 ## Import Bootstrap for quick, responsive layouts
+
+Download Bootstrap and jQuery from their official websites and copy those files into public folder as follows:
+
+* public
+    * bootstrap
+        * css
+            * amelia.bootstrap.css
+            * amelia.bootstrap.min.css
+            * bootstrap.min.css
+        * fonts
+            * glyphicons-halflings-regular.eot
+            * glyphicons-halflings-regular.svg
+            * glyphicons-halflings-regular.ttf
+            * glyphicons-halflings-regular.woff
+        * js
+            * bootstrap.js
+            * bootstrap.min.js
+
+### Using Bootstrap in the application
+
+#### Working with Jade templates
+
+Jade templates are often set up to work by having a main layout file that has defined areas for other Jade files to extend.
+
+If you want to add some external files to the entire application, then use the layout.jade file:
+
+* Reference the Bootstrap CSS file,
+* Reference the Bootstrap JavaScript file,
+* Reference jQuery, which Bootstrap requires.
+* Add viewport metadata so that the page scales nicely on mobile devices.
+
+```js
+doctype html
+html
+  head
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    title= title
+    link(rel='stylesheet', href='/bootstrap/css/usebootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    block content
+  script(src='/javascripts/jquery-2.1.4.js')
+```
