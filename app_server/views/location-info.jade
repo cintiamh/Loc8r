@@ -1,0 +1,79 @@
+extends layout
+
+block content
+  .row.page-header
+    .col-lg-12
+      h1 Starcups
+  .row
+    .col-xs-12.col-md-9
+      .row
+        .col-xs-12.col-sm-6
+          p.rating
+            span.glyphicon.glyphicon-star
+            span.glyphicon.glyphicon-star
+            span.glyphicon.glyphicon-star
+            span.glyphicon.glyphicon-star-empty
+            span.glyphicon.glyphicon-star-empty
+          p 125 High Street, Reading, RG6 1PS
+            .panel.panel-primary
+              .panel-heading
+                h2.panel-title Opening hours
+              .panel-body
+                p Monday - Friday : 7:00am - 7:00pm
+                p Saturday : 8:00am - 5:00pm
+                p Sunday : closed
+            .panel.panel-primary
+              .panel-heading
+                h2.panel-title Facilities
+              .panel-body
+                span.label.label-warning
+                  span.glyphicon.glyphicon-ok
+                  | &nbsp;Hot drinks
+                | &nbsp;
+                span.label.label-warning
+                  span.glyphicon.glyphicon-ok
+                  | &nbsp;Food
+                | &nbsp;
+                span.label.label-warning
+                  span.glyphicon.glyphicon-ok
+                  | &nbsp;Premium wifi
+                | &nbsp;
+          .col-xs-12.col-sm-6.location-map
+            .panel.panel-primary
+              .panel-heading
+                h2.panel-title Location map
+              .panel-body
+                img.img-responsive.img-rounded(src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3170.2781401736743!2d-121.89658678472541!3d37.38325404236124!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fcc0ed9fc9177%3A0x4ee969267e4ee3f2!2sStarbucks!5e0!3m2!1sen!2sus!4v1452564958896")
+  .row
+    .col-xs-12
+      .panel.panel-primary.review-panel
+        .panel-heading
+          a.btn.btn-default.pull-right(href='/location/review/new') Add review
+          h2.panel-title Customer reviews
+        .panel-body.review-container
+          .row
+            .review
+              .well.well-sm.review-header
+                span.rating
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star
+                span.reviewAuthor Simon Holmes
+                small.reviewTimestamp 16 July 2013
+              .col-xs-12
+                p What a great place. I can't say enough good things about it.
+          .row
+            .review
+              .well.well-sm.review-header
+                span.rating
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star
+                  span.glyphicon.glyphicon-star-empty
+                  span.glyphicon.glyphicon-star-empty
+                span.reviewAuthor Charlie Chaplin
+                small.reviewTimestamp 16 June 2013
+              .col-xs-12
+                p It was okay. Coffee wasn't great, but the wifi was fast.
