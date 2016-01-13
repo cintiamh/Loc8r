@@ -125,3 +125,59 @@ html
                     small &copy; Cintia Higashi 2016
   script(src='/javascripts/jquery-2.1.4.js')
 ```
+
+## Take the data out of the views and make them smarter
+
+### How to move data from the view to the controller
+
+The second parameter in the `render` method in the controller is a JSON object containing the data to send to the view.
+
+So update your controller to:
+
+```js
+module.exports.homeList = function(req, res) {
+    res.render('locations-list',
+    {
+      title: 'Loc8r - find a place to work with wifi',
+      pageHeader: {
+        title: 'Loc8r',
+        strapline: 'Find places to work with wifi near you!'
+      }
+    });
+};
+```
+
+Now you can access those values in the view:
+
+```
+h1= pageHeader.title
+  small &nbsp;#{pageHeader.strapline}
+```
+
+#### Referencing data in Jade templates
+
+There are two key syntaxes for referencing data in Jade templates.
+
+The first is called interpolation, and it's typically used to insert data into the middle of some other content.
+
+```
+h1 Welcome to #{pageHeader.title}
+```
+
+If your data contains HTML, this will be escaped for security reasons. If you want the browser to render any HTML contained in the data you can use the following syntax:
+
+```
+h1 Welcome to !{pageHeader.title}
+```
+
+The second method of outputting the data is with buffered code, where you build the string using JavaScript. This is done by using the = sign directly after the tag declaration.
+
+```
+h1= "Welcome to " + pageHeader.title
+```
+
+Again, this will escape any HTML for security reasons. If you want to have unescaped HTML in your output you can use slightly different syntax:
+
+```
+h1!= "Welcome to " + pageHeader.title
+```
