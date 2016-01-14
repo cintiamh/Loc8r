@@ -181,3 +181,95 @@ Again, this will escape any HTML for security reasons. If you want to have unesc
 ```
 h1!= "Welcome to " + pageHeader.title
 ```
+
+### Dealing with complex, repeating data
+
+We need to create an array of the single location objects and add it to the data object passed to the render function in the controller.
+
+```js
+module.exports.homeList = function(req, res) {
+    res.render('locations-list',
+    {
+      title: 'Loc8r - find a place to work with wifi',
+      pageHeader: {
+        title: 'Loc8r',
+        strapline: 'Find places to work with wifi near you!'
+      },
+      locations: [
+        {
+          name: 'Starcups',
+          address: '125 High Street, Reading, RG6 1PS',
+          rating: 3,
+          facilities: ['Hot drinks', 'Food', 'Premium wifi'],
+          distance: '100m'
+        },
+        ...
+      ]
+    });
+};
+```
+
+The Jade template will look like this:
+
+```
+each location in locations
+  .col-xs-12.list-group-item
+    h4
+      a(href="/location")= location.name
+      small &nbsp;
+        span.glyphicon.glyphicon-star
+        span.glyphicon.glyphicon-star
+        span.glyphicon.glyphicon-star
+        span.glyphicon.glyphicon-star-empty
+        span.glyphicon.glyphicon-star-empty
+      span.badge.pull-right.badge-default= location.distance
+    p.address= location.address
+    p
+      each facility in location.facilities
+        span.label.label-warning= facility
+        &nbsp;
+```
+
+### Manipulating the data and view with code
+
+We can do some coding inside Jade. The code is essentially JavaScript. To add a line of inline code to a Jade template we prefix the line with a dash "-".
+
+```
+- for (var i = 1; i <= location.rating; i++)
+  span.glyphicon.glyphicon-star
+- for (i = location.rating; i < 5; i++)
+  span.glyphicon.glyphicon-star-empty
+```
+
+Notice that the syntax is very similar to JavaScript, but there are no curly braces and we are defining the scope with indentation.
+
+### Using includes and mixins to create reusable layout components
+
+#### Defining Jade mixins
+
+A mixin in Jade is essentially a function. You only need to define the name of the mixin, and then nest the content of it with indentation.
+
+To call a mixin just place a "+" before its name.
+
+We can define this in the top of the same file, between `extends layout` and `block content`
+
+```
+mixin outputRating(rating)
+  - for (var i = 1; i <= rating; i++)
+    span.glyphicon.glyphicon-star
+  - for (i = rating; i < 5; i++)
+    span.glyphicon.glyphicon-star-empty
+```
+
+And replace in the previous block:
+
+```
+small &nbsp;
+  +outputRating(location.rating)
+```
+
+We can also define the mixin in a separated file and use include to the relative file path to use the mixin in multiple files:
+
+```
+include _includes/sharedHTMLfunctions
+```
