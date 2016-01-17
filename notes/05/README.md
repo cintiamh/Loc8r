@@ -20,10 +20,9 @@ Mongoose includes the ability to add validation to our data definitions.
 
 MongoDB only talks to Mongoose, and Mongoose talks to Node and Express.
 
-|--------------------------------------------------------------------|
 | Database  |           Application            | Browser application |
-| MongoDB  <=> Mongoose <=> Node.js / Express <=>    Angular.js      |
-|--------------------------------------------------------------------|
+|-----------|----------------------------------|---------------------|
+| MongoDB   |  Mongoose <=> Node.js / Express  |    Angular.js       |
 
 ### Adding Mongoose to our application
 
@@ -40,3 +39,27 @@ This pool of connections is shared between all requests.
 
 Opening and closing connections to databases can take a while, especially if your database is on a separated server.
 The best practice is to open the connection when your application starts up, and to leave it open until your application restarts or shuts down.
+
+#### Setting up the connection file
+
+In app_server/models/db.js
+
+```js
+var mongoose = require('mongoose');
+```
+
+Require this file in app.js:
+
+```js
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+require('./app_server/models/db');
+```
+
+We're not going to export any functions from db.js, so we don't need to assign it to a variable when we require it.
+
+#### Creating the Mongoose connection
