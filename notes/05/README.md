@@ -462,3 +462,19 @@ $ NODE_ENV=production nodemon
 ```
 
 Don't set NODE_ENV from inside the application, only read it.
+
+If you’re using a different provider that hasn’t added anything to the Heroku configuration, you can add in your URI with the heroku config:set command that we used to ensure Heroku is running in production mode.
+
+```js
+var dbURI = 'mongodb://localhost/Loc8r';
+if (process.env.NODE_ENV === 'production') {
+  dbURI = process.env.MONGOLAB_URI;
+}
+mongoose.connect(dbURI);
+```
+
+Testing locally:
+
+```
+$ NODE_ENV=production MONGOLAB_URI=mongodb://<username>:<password>@<hostname>:<port>/<database> nodemon start
+```
