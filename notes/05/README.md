@@ -195,4 +195,270 @@ The schema defines the name for each data path, and the data type it will contai
 * Buffer - For binary information such as images.
 * Mixed - Any data type
 * Array - Can either be an array of the same data type, or an array of nested subdocuments
-* ObjectId - For a unique ID in a path other than "_id"
+* ObjectId - For a unique ID in a path other than "id"
+
+## Defining simple Mongoose schemas
+
+Create the file app_server/models/locations.js:
+
+```js
+var mongoose = require('mongoose');
+```
+
+And require it from the end of db.js:
+
+```js
+require('./locations');
+```
+
+### The basics of setting up a schema
+
+```js
+var locationSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    address: String,
+    rating: {type: Number, "default": 0, min: 0, max: 5},
+    facilities: [String],
+    coords: {type: [Number], index: '2dsphere'}
+});
+```
+
+The data for a single geographical location is stored according to the GeoJSON format specification.
+The 2dsphere enables MongoDB to do the correct calculations on geometries based on a spherical object.
+To meet the GeoJSON specification, a coordinate pair must be entered into the array in the correct order: longitude then latitude.
+
+### Creating more complex schemas with subdocuments
+
+In a document database anything that belongs specifically to a parent document should be contained within that document.
+In a relational database you'd create some separated tables, and join them together in a query when you need the information, like opening hours and reviews.
+
+MongoDB offers the concept of subdocuments to store these repeating, nested data.
+Subdocuments are very much like documents in that they have their own schema and each is given an unique id by MongoDB when created.
+But subdocuments are nested inside a document and they can only be accessed as a path of that parent document.
+
+```js
+var openingTimeSchema = new mongoose.Schema({
+    days: {type: String, required: true},
+    opening: String,
+    closing: String,
+    closed: {type: Boolean, required: true}
+});
+
+var reviewSchema = new mongoose.Schema({
+    author: String,
+    rating: {type: Number, required: true, min: 0, max: 5},
+    reviewText: String,
+    createdOn: {type: Date, "default": Date.now}
+})
+
+var locationSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    address: String,
+    rating: {type: Number, "default": 0, min: 0, max: 5},
+    facilities: [String],
+    coords: {type: [Number], index: '2dsphere'},
+    openingTimes: [openingTimeSchema],
+    reviews: [reviewSchema]
+});
+```
+
+### Compiling Mongoose schemas into models
+
+An application doesn't interact with the schema directly when working with data; data interaction is done through models.
+
+In Mongoose, a model is a compiled version of the schema.
+Once compiled, a single instance of the model maps directly to a single document in your database.
+It's through this direct one-to-one relationship that the model can create, read, save, and delete data.
+
+#### Compiling a model from a schema
+
+You just need to ensure that the schema is complete before you invoke the `model` command.
+
+```js
+mongoose.model('Location', locationSchema, 'Locations');
+```
+
+The parameters are:
+* 'Location': The name of the model
+* locationSchema: The schema to use
+* 'Locations': MongoDB collection name (optional - default is pluralized version of the model name)
+
+## Using the MongoDB shell to create a MongoDB database and add data
+
+### MongoDB shell basics
+
+Starting the MongoDB shell:
+
+```
+$ mongo
+```
+
+Listing all local databases
+
+```
+> show dbs
+```
+
+Using a specific database:
+
+```
+> use local
+```
+
+Listing the collections in a database:
+
+```
+> show collections
+```
+
+Seeing the contents of a collection
+
+```js
+db.collectionName.find(queryObject)
+```
+
+The simplest query is an empty query, which will return all of the documents in a collection.
+
+```
+> db.startup_log.find()
+> db.startup_log.find().pretty()
+```
+
+### Creating a MongoDB database
+
+You don't have to actually create a MongoDB database; you just have to start to use it.
+
+```
+> use Loc8r
+```
+
+#### Creating a collection and documents
+
+Similarly, you don't have to explicitly create a collection as MongoDB will create it for you when you first save data into it.
+
+```
+> db.locations.save({  
+    name: 'Starcups',
+    address: '125 High Street, Reading, RG6 1PS',
+    rating: 3,
+    facilities: ['Hot drinks', 'Food', 'Premium wifi'],
+    coords: [-0.9690884, 51.455041],
+    openingTimes: [{
+        days: 'Monday - Friday',
+        opening: '7:00am',
+        closing: '7:00pm',
+        closed: false
+    }, {
+        days: 'Saturday',
+        opening: '8:00am',
+        closing: '5:00pm',
+        closed: false
+    }, {
+        days: 'Sunday',
+        closed: true
+    }]
+})
+```
+
+#### Adding subdocuments
+
+MongoDB has an update command that accepts two arguments, the first being a query so that it knows which document to update, and the second contains the instructions on what to do when it has found the document.
+
+```
+> db.locations.update({
+    name: 'Starcups'
+}, {
+    $push: {
+        reviews: {
+            author: 'Simon Holmes',
+            id: ObjectId(),
+            rating: 5,
+            timestamp: new Date("July 16, 2013"),
+            reviewText: 'What a great place. I can\'t say enough good things about it.'
+        }
+    }
+})
+```
+
+## Getting our database live
+
+### Setting up MongoLab and getting the database URI
+
+http://docs.mongolab.com/
+
+```
+$ heroku config:set MONGOLAB_URI=your_db_uri
+```
+
+### Pushing up the data
+
+Creating a temporary folder:
+
+```
+$ mkdir -p ~/tmp/mongodump
+```
+
+#### Dumping the data from the development database
+
+`mongodump` parameters:
+
+* `-h` - the host server
+* `-d` - the database name
+* `-o` - the output destination folder
+
+```
+$ mongodump -h localhost:27017 -d Loc8r -o ~/tmp/mongodump
+```
+
+#### Restoring the data to your live database
+
+`mongorestore` parameters:
+
+* `-h` - live host and port
+* `-d` - live database name
+* `-u` - Username for the live database
+* `-p` - Password for the live database
+* Path to the dump directory and database name.
+
+```
+$ mongorestore -h ds033669.mongolab.com:33669 -d heroku_app20110907 -u heroku_app20110907 -p 4rqhlidfdqq6vgdi06c15jrlpf ~/tmp/mongodump/Loc8r
+```
+
+#### Testing the live database
+
+```
+$ mongo hostname:port/database_name -u username -p password
+
+$ mongo ds033669.mongolab.com:33669/heroku_app20110907 -u heroku_app20110907 -p 4rqhlidfdqq6vgdi06c15jrlpf
+```
+
+```
+> show collections
+> db.locations.find()
+```
+
+### Making the application use the right database
+
+#### The NODE_ENV environment variable
+
+The application already uses NODE_ENV. By default Heroku should set NODE_ENV to production so that the application will run in production mode on their server.
+
+To ensure Heroku is using production mode:
+
+```
+$ heroku config:set NODE_ENV=production
+```
+
+You can read NODE_ENV from anywhere in the application by using:
+
+```
+process.env.NODE_ENV
+```
+
+Unless specified in your environment this will come back as `undefined`. You can specify different environment variables when starting the Node application by prepending the assignment to the launch command.
+
+```
+$ NODE_ENV=production nodemon
+```
+
+Don't set NODE_ENV from inside the application, only read it.
